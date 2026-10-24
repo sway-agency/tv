@@ -34,6 +34,7 @@ Stock Android TV launchers are slow, full of ads and sponsored rows, and TV make
 - **Lightweight.** Plain Java, no Gradle, no AndroidX, no library. Runs smoothly on 2 GB TVs.
 - **One-command debloat.** Disable manufacturer bloatware and unused Google services, fully reversible, no root.
 - **Set up by AI.** Give the repository link to Claude Code or any coding agent and it installs everything, asking you which apps to keep.
+- **Controlled by AI.** An optional, hardened MCP server lets your personal AI agent or voice assistant drive the TV, safely.
 
 ## Features
 
@@ -44,6 +45,8 @@ Stock Android TV launchers are slow, full of ads and sponsored rows, and TV make
 - Organic spring animations and light snowfall
 - Fireplace with crackling sound, as an app and as the system screensaver (daydream)
 - Debloat lists per TV brand, shared by the community
+- Privacy audit: see and revoke which apps can use the microphone, a camera or the location
+- Optional AI remote control over MCP: Claude, Hermes Agent, OpenJarvis, voice assistants
 
 ## Install with an AI agent (easiest)
 
@@ -77,8 +80,22 @@ make dock TV=192.168.1.20 DOCK="com.netflix.ninja com.disney.disneyplus"
 | `make debloat` | Disables the recommended packages, or only `PACKAGES="..."` |
 | `make dock` | Sets the dock apps, in order |
 | `make restore` | Re-enables everything disabled from this repository |
+| `make privacy` | Lists apps allowed to use the microphone, a camera or the location |
+| `make privacy-lock` | Revokes those permissions from `PACKAGES="..."` |
 
 Outside macOS, set `ANDROID_SDK` (with `build-tools;36.0.0` and `platforms;android-36`) and `ACCUEIL_JDK` (JDK 17). Run `make help` for every target.
+
+## Control the TV with your AI agent
+
+`accueil-bridge` is a small MCP server (Go, zero dependencies, 20 MB of RAM) that runs on a machine at home and lets an AI agent press remote keys, open apps, turn the screen on or off or start the fireplace. TLS 1.3, per-agent tokens with scopes, rate limiting, no camera or microphone access, no shell, never exposed to the internet: remote access goes through WireGuard on your box.
+
+```sh
+make bridge-init TV=192.168.1.20 LISTEN=192.168.1.10:8443 HOSTS="192.168.1.10"
+make bridge-token NAME=claude
+make bridge-serve
+```
+
+Full guide, security model and agent setup: [`docs/bridge.md`](docs/bridge.md).
 
 ## How to remove bloatware from an Android TV
 
@@ -99,6 +116,8 @@ Your brand is missing? The AI agent writes the list with you and opens a pull re
 **Can I go back to the original launcher?** Yes. Run `make restore`, then uninstall Accueil from the TV settings.
 
 **Does it work on Google TV?** Yes. The Google TV home is disabled like any other stock launcher, and can be restored.
+
+**Can an AI agent control the TV remotely?** Yes, with `accueil-bridge`. It is never exposed to the internet: use the WireGuard VPN of your box to reach it from outside. See [`docs/bridge.md`](docs/bridge.md).
 
 **Can I change the wallpapers or the fireplace?** Yes. Drop JPEG files in `assets/wallpapers/`, or replace `assets/fireplace/fire.mp4`, then run `make quick`.
 

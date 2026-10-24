@@ -25,7 +25,7 @@ Packages found on every Android TV belong in `common.txt`; open a separate pull 
 
 1. Branch from `main`: `feature/<topic>` or `fix/<topic>`.
 2. Keep the change small and focused.
-3. Run `python3 scripts/norminette.py` and `./build.sh`.
+3. Run `python3 scripts/norminette.py`, `./build.sh`, and `make bridge-test` if you touched `bridge/`.
 4. If you have a TV, install it with `make quick TV=<ip>` and attach a screenshot to the pull request.
 5. Commit following the rules below.
 
@@ -49,4 +49,13 @@ fix(fireplace): release players when the surface is destroyed
 
 ## Pull requests
 
-Fill in `.github/pull_request_template.md`. CI runs the norminette and a build on every pull request.
+`main` is protected: every change goes through a pull request, CI must pass, and force-pushes are refused. Pull requests are squash-merged, so the PR title becomes the commit and must follow the commit rules above (CI checks it).
+
+Fill in `.github/pull_request_template.md`. CI runs on every pull request:
+
+- **norminette**: the Sway norm (`NORME.md`);
+- **java**: compilation with every warning as an error, then the APK build;
+- **go**: `gofmt`, `go vet`, tests with the race detector, build, `govulncheck`;
+- **CodeQL**: security analysis of the Java, Go and workflow code.
+
+Dependabot opens update pull requests for GitHub Actions and the Go toolchain every week.
