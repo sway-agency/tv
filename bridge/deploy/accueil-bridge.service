@@ -1,0 +1,49 @@
+[Unit]
+Description=Accueil TV bridge (MCP over TLS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=accueil-bridge
+Group=accueil-bridge
+Environment=HOME=/var/lib/accueil-bridge
+ExecStart=/usr/local/bin/accueil-bridge serve --dir /var/lib/accueil-bridge/config
+Environment=GOMEMLIMIT=48MiB
+MemoryMax=96M
+TasksMax=32
+Restart=on-failure
+RestartSec=5
+StateDirectory=accueil-bridge
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+DevicePolicy=closed
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+IPAddressDeny=any
+IPAddressAllow=localhost 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 fd00::/8 fe80::/10
+
+[Install]
+WantedBy=multi-user.target

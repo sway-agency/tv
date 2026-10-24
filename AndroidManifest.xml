@@ -31,7 +31,8 @@
 
         <activity
             android:name=".FireplaceActivity"
-            android:exported="false"
+            android:exported="true"
+            android:permission="android.permission.DUMP"
             android:label="Cheminée"
             android:screenOrientation="landscape" />
 

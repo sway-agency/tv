@@ -18,7 +18,7 @@ La norme a deux objectifs principaux :
 
 ### I.2 La norme dans vos commits
 
-Tout le code Java, shell, Makefile et les listes de paquets doivent respecter la norme.
+Tout le code Java, Go, shell, Makefile et les listes de paquets doivent respecter la norme.
 Elle est vérifiée par la **norminette** (`scripts/norminette.py`), exécutée en CI sur
 **chaque push et chaque pull request** (workflow `ci.yml`).
 
@@ -108,7 +108,45 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 
 ---
 
-## Chapitre IV : Shell et Makefile
+## Chapitre IV : Go (bridge IA)
+
+### Partie obligatoire
+
+- **N-GO-01** : un fichier ne dépasse pas **200 lignes** (400 pour un `_test.go`).
+- **N-GO-02** : une fonction ne dépasse pas **100 lignes**.
+- **N-GO-03** : l'assignation et le test d'une erreur se font sur **deux lignes**. La forme `if err := f(); err != nil {}` est interdite.
+- **N-GO-05** : chaque outil MCP (`tool_<nom>.go`) a son fichier de test (`tool_<nom>_test.go`), qui couvre aussi les entrées refusées.
+- **N-GO-06** : un fichier de package bibliothèque (`internal/`) contient au maximum **5 fonctions**.
+- **N-GO-07** : **aucun commentaire**, hors directives `//go:`.
+
+### Architecture (obligatoire, vérifiée en revue)
+
+- **Architecture hexagonale** : `internal/tv` expose le port `Controller` avec deux implémentations, l'adapter `ADB` et le `Mock` des tests. Le protocole (`internal/mcp`) et le transport (`internal/server`) ne connaissent que le port.
+- **Bibliothèque standard uniquement** : aucune dépendance tierce (N-SEC-03). Le binaire se compile avec `CGO_ENABLED=0`.
+- Toute entrée venant du réseau est validée par une liste blanche avant d'atteindre `adb` ; aucun appel ne passe par un shell.
+- Les erreurs renvoyées aux agents sont génériques ; le détail reste dans le journal local.
+
+### Partie conseillée
+
+- Imports en 3 groupes séparés par une ligne vide : stdlib, tiers (aucun ici), internes.
+- Retour anticipé : pas de `else` après un `return`.
+- Journalisation structurée avec `log/slog` en JSON, sans jamais journaliser un jeton ni un texte saisi.
+
+---
+
+## Chapitre V : Sécurité
+
+### Partie obligatoire
+
+- **N-SEC-01** : le launcher ne demande **aucune permission Android** (`<uses-permission>` interdit), ni réseau, ni caméra, ni micro, ni localisation.
+- **N-SEC-02** : seul `bridge/internal/tv/adb.go` peut lancer un processus.
+- **N-SEC-03** : `bridge/go.mod` ne contient aucun `require`.
+- Le bridge n'écoute jamais sur `0.0.0.0`, `::` ou une adresse publique, et n'offre aucun outil pour lancer une commande, installer une appli, ouvrir une URL, afficher un contenu externe ou accéder à la caméra ou au micro.
+- Les Actions GitHub sont épinglées par SHA de commit ; Dependabot les met à jour.
+
+---
+
+## Chapitre VI : Shell et Makefile
 
 ### Partie obligatoire
 
@@ -119,7 +157,7 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 
 ---
 
-## Chapitre V : Listes de paquets
+## Chapitre VII : Listes de paquets
 
 ### Partie obligatoire
 
@@ -129,7 +167,7 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 
 ---
 
-## Chapitre VI : Marque Sway
+## Chapitre VIII : Marque Sway
 
 ### Partie obligatoire
 
@@ -140,7 +178,7 @@ Ces deux règles protègent la marque Sway et font partie des conditions de la l
 
 ---
 
-## Chapitre VII : Git
+## Chapitre IX : Git
 
 ### Partie obligatoire
 
@@ -156,7 +194,7 @@ Ces deux règles protègent la marque Sway et font partie des conditions de la l
 
 ---
 
-## Chapitre VIII : La norminette
+## Chapitre X : La norminette
 
 ### Usage
 
@@ -183,6 +221,15 @@ Sortie : `fichier:ligne: [N-XXX-NN] message`. Code retour `0` si conforme, `1` s
 | N-JAVA-05 | Import avec joker |
 | N-JAVA-06 | Assignation dans une condition |
 | N-JAVA-07 | Plus de 5 méthodes dans une classe utilitaire |
+| N-GO-01 | Fichier Go > 200 lignes (test > 400) |
+| N-GO-02 | Fonction Go > 100 lignes |
+| N-GO-03 | `if err := f(); err != nil` |
+| N-GO-05 | Outil MCP sans fichier de test |
+| N-GO-06 | Plus de 5 fonctions dans un fichier bibliothèque |
+| N-GO-07 | Commentaire en Go |
+| N-SEC-01 | Permission Android demandée par le launcher |
+| N-SEC-02 | Processus lancé hors de `adb.go` |
+| N-SEC-03 | Dépendance Go tierce |
 | N-SH-01 | Script sans `#!/bin/bash` et `set -euo pipefail` |
 | N-SH-02 | Commentaire dans un script ou le Makefile |
 | N-PKG-01 | Ligne de liste de paquets mal formée |

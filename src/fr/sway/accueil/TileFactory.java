@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -34,23 +36,24 @@ final class TileFactory {
     }
 
     View appTile(LauncherApp app, Runnable onClick) {
-        FrameLayout card = card(Color.argb(90, 255, 255, 255));
+        FrameLayout card = card(solid(Color.argb(90, 255, 255, 255)));
         ImageView image = new ImageView(context);
         if (app.banner != null) {
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            image.setImageDrawable(app.banner);
+            image.setImageDrawable(ownCopy(app.banner));
             card.addView(image, new FrameLayout.LayoutParams(tileWidth, tileHeight));
         } else {
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            image.setImageDrawable(app.icon);
+            image.setImageDrawable(ownCopy(app.icon));
             int iconSize = tileHeight / 2;
             card.addView(image, new FrameLayout.LayoutParams(iconSize, iconSize, Gravity.CENTER));
         }
         return wrap(card, app.label, onClick);
     }
 
-    View iconTile(Bitmap icon, String title, String caption, Runnable onClick) {
-        FrameLayout card = card(Color.argb(140, 18, 18, 22));
+    View glassTile(Bitmap icon, String title, String caption, Runnable onClick) {
+        FrameLayout card = card(glass());
+        card.setElevation(0f);
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.HORIZONTAL);
         content.setGravity(Gravity.CENTER);
@@ -73,10 +76,30 @@ final class TileFactory {
         return wrap(card, caption, onClick);
     }
 
-    private FrameLayout card(int fillColor) {
-        GradientDrawable background = new GradientDrawable();
-        background.setColor(fillColor);
-        background.setCornerRadius(tileHeight * 0.12f);
+    private static Drawable ownCopy(Drawable shared) {
+        Drawable.ConstantState state = shared == null ? null : shared.getConstantState();
+        return state == null ? shared : state.newDrawable();
+    }
+
+    private Drawable solid(int color) {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(color);
+        fill.setCornerRadius(tileHeight * 0.12f);
+        return fill;
+    }
+
+    private Drawable glass() {
+        GradientDrawable sheen = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] {
+                Color.argb(80, 255, 255, 255), Color.argb(14, 255, 255, 255), Color.argb(0, 255, 255, 255)});
+        sheen.setCornerRadius(tileHeight * 0.12f);
+        GradientDrawable rim = new GradientDrawable();
+        rim.setColor(Color.TRANSPARENT);
+        rim.setCornerRadius(tileHeight * 0.12f);
+        rim.setStroke(Math.max(1, tileHeight / 90), Color.argb(130, 255, 255, 255));
+        return new LayerDrawable(new Drawable[] {solid(Color.argb(42, 255, 255, 255)), sheen, rim});
+    }
+
+    private FrameLayout card(Drawable background) {
         FrameLayout card = new FrameLayout(context);
         card.setBackground(background);
         card.setClipToOutline(true);
@@ -104,7 +127,7 @@ final class TileFactory {
         label.setGravity(Gravity.CENTER);
         label.setAlpha(0f);
         LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(tileWidth, LinearLayout.LayoutParams.WRAP_CONTENT);
-        labelParams.topMargin = spacing * 3 / 2;
+        labelParams.topMargin = spacing / 2;
         tile.addView(label, labelParams);
 
         tile.setOnFocusChangeListener((view, focused) -> {

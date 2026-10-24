@@ -28,8 +28,16 @@ FORBIDDEN_DOC_DASHES = re.compile(DASH_GLYPHS)
 JAVA_STRING = re.compile(r'"(?:[^"\\]|\\.)*"')
 JAVA_METHOD_START = re.compile(r"^    \S.*\)\s*(throws [\w., ]+)?\{$")
 PACKAGE_LINE = re.compile(r"^[a-z][\w.]*\*? \| \S.*$")
+MAX_GO_FILE_LINES = 200
+MAX_GO_TEST_FILE_LINES = 400
+MAX_GO_FUNCTION_LINES = 100
+MAX_GO_LIBRARY_FUNCTIONS = 5
+GO_STRING = re.compile(r'"(?:[^"\\]|\\.)*"|`[^`]*`')
+GO_ERROR_IN_CONDITION = re.compile(r"^\s*if .*:=.*;.*\berr\b")
+GO_EXEC_OWNER = "bridge/internal/tv/adb.go"
 TEXT_GLOBS = ["src/**/*.java", "scripts/*.sh", "scripts/*.py", "build.sh", "Makefile",
-              "config/**/*.txt", "*.txt", "*.md", ".github/**/*.md", ".github/**/*.yml", "AndroidManifest.xml"]
+              "config/**/*.txt", "*.txt", "*.md", ".github/**/*.md", ".github/**/*.yml", "AndroidManifest.xml",
+              "bridge/**/*.go", "bridge/go.mod", "bridge/deploy/*", "docs/*.md"]
 
 errors = []
 
@@ -97,6 +105,45 @@ def check_java(path, lines):
     check_java_lines(path, lines)
     check_java_methods(path, lines, is_utility_class(path, lines))
 
+def check_go_lines(path, lines):
+    for number, line in enumerate(lines, 1):
+        code = GO_STRING.sub('""', line)
+        if ("//" in code and not code.lstrip().startswith("//go:")) or "/*" in code:
+            report(path, number, "N-GO-07", "comment in Go code")
+        if GO_ERROR_IN_CONDITION.match(code):
+            report(path, number, "N-GO-03", "assign and test an error on two lines")
+        if "exec.Command" in code and path.relative_to(ROOT).as_posix() != GO_EXEC_OWNER:
+            report(path, number, "N-SEC-02", f"processes may only be started from {GO_EXEC_OWNER}")
+
+def check_go_functions(path, lines):
+    start, count = None, 0
+    for number, line in enumerate(lines, 1):
+        if line.startswith("func ") and line.endswith("{"):
+            start, count = number, count + 1
+        elif line == "}" and start is not None:
+            if number - start + 1 > MAX_GO_FUNCTION_LINES:
+                report(path, start, "N-GO-02", f"function longer than {MAX_GO_FUNCTION_LINES} lines")
+            start = None
+    library = "/internal/" in path.as_posix() and not path.name.endswith("_test.go")
+    if library and count > MAX_GO_LIBRARY_FUNCTIONS:
+        report(path, 1, "N-GO-06", f"more than {MAX_GO_LIBRARY_FUNCTIONS} functions in a library file")
+
+def check_go(path, lines):
+    limit = MAX_GO_TEST_FILE_LINES if path.name.endswith("_test.go") else MAX_GO_FILE_LINES
+    if len(lines) - 1 > limit:
+        report(path, len(lines), "N-GO-01", f"file longer than {limit} lines")
+    if path.name.startswith("tool_") and not path.name.endswith("_test.go"):
+        if not path.with_name(path.stem + "_test.go").exists():
+            report(path, 1, "N-GO-05", "every MCP tool needs its own test file")
+    check_go_lines(path, lines)
+    check_go_functions(path, lines)
+
+def check_security(path, lines):
+    if path.name == "go.mod" and any(line.startswith("require") for line in lines):
+        report(path, 1, "N-SEC-03", "the bridge must not depend on third-party modules")
+    if path.name == "AndroidManifest.xml" and any("<uses-permission" in line for line in lines):
+        report(path, 1, "N-SEC-01", "the launcher must not request any Android permission")
+
 def check_shell(path, lines, is_makefile):
     if not is_makefile and lines[:2] != ["#!/bin/bash", "set -euo pipefail"]:
         report(path, 1, "N-SH-01", "script must start with #!/bin/bash and set -euo pipefail")
@@ -136,6 +183,10 @@ def main():
         lines = check_common(path, path.read_text(), fix)
         if path.suffix == ".java":
             check_java(path, lines)
+        elif path.suffix == ".go":
+            check_go(path, lines)
+        elif path.name in ("go.mod", "AndroidManifest.xml"):
+            check_security(path, lines)
         elif path.suffix == ".sh" or path.name == "Makefile":
             check_shell(path, lines, path.name == "Makefile")
         elif path.parent.name == "packages" and path.suffix == ".txt":

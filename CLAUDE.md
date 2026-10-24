@@ -1,6 +1,6 @@
 # Accueil: guide for AI agents
 
-Accueil is an Android TV launcher by Sway. Plain Java, no Gradle, built by `build.sh` and driven by `make`. Every TV operation goes through `scripts/tv.sh` via a `make` target.
+Accueil is an Android TV launcher by Sway. Plain Java, no Gradle, built by `build.sh` and driven by `make`. Every TV operation goes through `scripts/tv.sh` via a `make` target. `bridge/` holds `accueil-bridge`, a Go MCP server that lets AI agents control the TV (see `docs/bridge.md`).
 
 Read `NORME.md` before writing code. Run `python3 scripts/norminette.py` before you finish: it must print `Norminette: OK`.
 
@@ -11,6 +11,9 @@ Read `NORME.md` before writing code. Run `python3 scripts/norminette.py` before 
 3. Never disable a package the person did not approve, and never disable anything the TV needs: TV inputs and tuner (`*.tv`, `*.tvinput`, `*passthrough*`, `com.android.providers.tv`), settings, system UI, Bluetooth, Wi-Fi, remote control services, keyboards, WebView, Google Play services, Play Store, firmware updates.
 4. Never commit `*.keystore`, `assets/fonts/`, `assets/fireplace/fire.mp4` or `state/`.
 5. Commits are one-line [Conventional Commits](https://www.conventionalcommits.org) (`type(scope): description`). Never add a `Co-Authored-By` trailer, a "Generated with" line or any mention of an AI, in commits or pull requests. See `CONTRIBUTING.md`.
+6. `main` is protected: work on a branch and open a pull request. CI (norminette, Java, Go, CodeQL) must pass. Never force-push.
+7. **Bridge security is not negotiable.** Never add a bridge tool that runs commands, installs apps, opens URLs, sends arbitrary intents, displays external content, or touches the camera, microphone or location. Never make the bridge listen on `0.0.0.0`, `::` or a public address, never advise forwarding ports 8443 or 5555 on a box (use WireGuard), never add a third-party Go module, never log tokens or typed text. Validate every new tool argument with an allowlist and write its test, including refused inputs.
+8. Keep the launcher light: it requests no Android permission, caches what it loads (fonts, icons, app list), and decodes images at screen size in `RGB_565` when they have no transparency.
 
 ## Quick install for a new TV
 
@@ -29,7 +32,12 @@ When someone gives you this repository to set up their TV, follow these steps in
 8. **Verify.** Take a screenshot with `adb -s <ip>:5555 exec-out screencap -p > build/screen.png`, look at it, and fix anything that looks wrong.
 9. **Unknown brand.** If step 4 said `unknown`, do the brand contribution below.
 
-`make restore TV=<ip>` re-enables everything this repository disabled on that TV.
+`make restore TV=<ip>` re-enables everything this repository disabled on that TV, and re-grants permissions revoked by `make privacy-lock`.
+
+Optional extras, ask before doing them:
+
+- **Privacy.** `make privacy TV=<ip>` lists apps allowed to use the microphone, a camera or the location. Offer `make privacy-lock TV=<ip> PACKAGES="..."` for the ones the person does not need.
+- **AI control.** Follow `docs/bridge.md` to install `accueil-bridge` on an always-on machine. Ask which scopes each agent token gets; `text` and `screen` stay off unless asked.
 
 ## Brand contribution (unknown brand)
 
@@ -49,7 +57,12 @@ When the TV brand has no `config/packages/<brand>.txt`:
 | `src/.../HomeActivity.java` | Home screen: wallpaper, dock, drawer wiring |
 | `src/.../TopBar.java` | Clock, settings button, Sway logo |
 | `src/.../DockReceiver.java`, `DockConfig.java` | Dock packages, set by `make dock` through a receiver only adb can reach |
-| `src/.../AppCatalog.java` | Lists TV apps, adds the fireplace tile |
+| `src/.../Dock.java`, `AppDrawer.java` | Dock row and app grid, rebuilt only when apps or the dock change |
+| `src/.../AppCatalog.java`, `PackageChanges.java` | Cached list of TV apps, invalidated on install or removal |
 | `src/.../FireplaceView.java` | Looping video and crackle, shared by the app and the screensaver |
 | `scripts/tv.sh` | All adb operations |
+| `bridge/internal/tv` | Port `Controller`, `ADB` adapter (the only place that starts a process), `Mock` |
+| `bridge/internal/mcp` | MCP protocol (2026-07-28 and legacy versions), one file per tool |
+| `bridge/internal/server` | TLS 1.3 server, authentication, rate limit, guards |
+| `bridge/internal/auth`, `config`, `pki` | Tokens and scopes, configuration checks, certificates |
 | `config/packages/` | Packages safe to disable, per brand |

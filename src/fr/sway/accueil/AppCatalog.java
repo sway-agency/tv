@@ -6,53 +6,46 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.DisplayMetrics;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 final class AppCatalog {
-    private static final List<String> HIDDEN_PACKAGES = Arrays.asList("com.tcl.partnercustomizer");
+    private static final String HIDDEN_PACKAGE = "com.tcl.partnercustomizer";
     private static final String FIREPLACE_BANNER = "fireplace/banner.jpg";
 
     private final Context context;
+    private List<LauncherApp> cached;
+    private int version;
 
     AppCatalog(Context context) {
         this.context = context;
     }
 
-    List<LauncherApp> tvApps() {
-        PackageManager packageManager = context.getPackageManager();
-        Intent query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
-        List<LauncherApp> apps = new ArrayList<>();
-        for (ResolveInfo resolveInfo : packageManager.queryIntentActivities(query, 0)) {
-            ActivityInfo activity = resolveInfo.activityInfo;
-            if (activity.packageName.equals(context.getPackageName()) || HIDDEN_PACKAGES.contains(activity.packageName)) {
-                continue;
-            }
-            apps.add(new LauncherApp(
-                    activity.packageName,
-                    resolveInfo.loadLabel(packageManager).toString(),
-                    sharpBanner(packageManager, activity),
-                    resolveInfo.loadIcon(packageManager),
-                    launchIntentFor(activity)));
-        }
-        apps.add(fireplace());
-        Collator collator = Collator.getInstance();
-        apps.sort((left, right) -> collator.compare(left.label, right.label));
-        return apps;
+    void invalidate() {
+        cached = null;
+        version++;
     }
 
-    List<LauncherApp> pick(List<LauncherApp> apps, List<String> packageNames) {
+    int version() {
+        return version;
+    }
+
+    List<LauncherApp> tvApps() {
+        if (cached == null) {
+            cached = Collections.unmodifiableList(load());
+        }
+        return cached;
+    }
+
+    List<LauncherApp> pick(List<String> packageNames) {
         List<LauncherApp> picked = new ArrayList<>();
         for (String packageName : packageNames) {
-            for (LauncherApp app : apps) {
+            for (LauncherApp app : tvApps()) {
                 if (app.packageName.equals(packageName)) {
                     picked.add(app);
                     break;
@@ -62,24 +55,28 @@ final class AppCatalog {
         return picked;
     }
 
-    private static Drawable sharpBanner(PackageManager packageManager, ActivityInfo activity) {
-        int bannerResource = activity.getBannerResource();
-        if (bannerResource != 0) {
-            try {
-                Resources resources = packageManager.getResourcesForApplication(activity.applicationInfo);
-                return resources.getDrawableForDensity(bannerResource, DisplayMetrics.DENSITY_XXXHIGH, null);
-            } catch (PackageManager.NameNotFoundException | Resources.NotFoundException ignored) {
+    private List<LauncherApp> load() {
+        PackageManager packageManager = context.getPackageManager();
+        Intent query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
+        List<LauncherApp> apps = new ArrayList<>();
+        for (ResolveInfo resolveInfo : packageManager.queryIntentActivities(query, 0)) {
+            ActivityInfo activity = resolveInfo.activityInfo;
+            if (activity.packageName.equals(context.getPackageName()) || activity.packageName.equals(HIDDEN_PACKAGE)) {
+                continue;
             }
+            Drawable banner = activity.loadBanner(packageManager);
+            Drawable icon = banner == null ? resolveInfo.loadIcon(packageManager) : null;
+            apps.add(new LauncherApp(activity.packageName, resolveInfo.loadLabel(packageManager).toString(),
+                    banner, icon, launchIntentFor(activity)));
         }
-        return activity.loadBanner(packageManager);
+        apps.add(fireplace());
+        Collator collator = Collator.getInstance();
+        apps.sort((left, right) -> collator.compare(left.label, right.label));
+        return apps;
     }
 
     private LauncherApp fireplace() {
-        Drawable banner = null;
-        try (InputStream stream = context.getAssets().open(FIREPLACE_BANNER)) {
-            banner = Drawable.createFromStream(stream, FIREPLACE_BANNER);
-        } catch (IOException ignored) {
-        }
+        Drawable banner = new BitmapDrawable(context.getResources(), AssetImages.opaque(context, FIREPLACE_BANNER));
         Intent intent = new Intent(context, FireplaceActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return new LauncherApp(context.getPackageName(), "Cheminée", banner, null, intent);
     }
