@@ -27,6 +27,8 @@ public class HomeActivity extends Activity {
     private SnowView snow;
     private LinearLayout dock;
     private AppDrawer drawer;
+    private FrameLayout root;
+    private boolean focusFirstOnResume;
     private int screenHeight;
 
     @Override
@@ -38,7 +40,7 @@ public class HomeActivity extends Activity {
         dockConfig = new DockConfig(this);
         tiles = new TileFactory(this, screenWidth * 12 / 100);
 
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
         root.setClipChildren(false);
         ImageView backLayer = wallpaperLayer();
@@ -65,6 +67,10 @@ public class HomeActivity extends Activity {
     protected void onResume() {
         super.onResume();
         populateDock();
+        if (focusFirstOnResume) {
+            focusFirstOnResume = false;
+            dock.post(this::focusFirstDockTile);
+        }
         Motion.riseIn(dock, screenHeight / 12f);
         wallpaperRotator.start();
         snow.start();
@@ -81,7 +87,7 @@ public class HomeActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         closeDrawer();
-        focusFirstDockTile();
+        focusFirstOnResume = true;
     }
 
     @Override
@@ -94,7 +100,7 @@ public class HomeActivity extends Activity {
         for (LauncherApp app : catalog.pick(catalog.tvApps(), dockConfig.packages())) {
             dock.addView(tiles.appTile(app, () -> launch(app.launchIntent)));
         }
-        dock.addView(tiles.iconTile(AssetImages.bitmap(this, GRID_ASSET), "Applis", "Toutes les applis", this::openDrawer));
+        dock.addView(tiles.glassTile(AssetImages.bitmap(this, GRID_ASSET), "Apps", "Toutes les apps", this::openDrawer));
         if (!drawer.isOpen()) {
             focusFirstDockTile();
         }
@@ -106,7 +112,7 @@ public class HomeActivity extends Activity {
             appTiles.add(tiles.appTile(app, () -> launch(app.launchIntent)));
         }
         dock.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
-        drawer.open(appTiles);
+        drawer.open(appTiles, Blur.of(root));
     }
 
     private void closeDrawer() {
