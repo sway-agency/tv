@@ -8,6 +8,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -91,8 +92,14 @@ public class HomeActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
-        closeDrawer();
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() != KeyEvent.KEYCODE_BACK) {
+            return super.dispatchKeyEvent(event);
+        }
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            closeDrawer();
+        }
+        return true;
     }
 
     private void populateDock() {
