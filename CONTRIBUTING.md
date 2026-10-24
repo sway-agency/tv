@@ -6,7 +6,7 @@ Thanks for helping. Humans and AI agents follow the same rules.
 
 - Read `NORME.md`. Code that fails the norminette is not merged.
 - AI agents also read `CLAUDE.md` (or `AGENTS.md`, the same file).
-- The Sway logo and its display are not open to changes (N-SWAY-01, N-SWAY-02).
+- The Sway logos and where they are displayed are not open to changes (N-SWAY-01, N-SWAY-02).
 
 ## Adding a TV brand
 

@@ -52,7 +52,7 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 - **N-ALL-01** : une ligne ne se termine jamais par des espaces ou des tabulations.
 - **N-ALL-02** : deux lignes vides consécutives sont interdites.
 - **N-ALL-03** : tout fichier se termine par un unique retour à la ligne.
-- **N-ALL-04** : **pas de point médian ni de tiret long dans un texte destiné à l'utilisateur** : ni `·`, ni `—`, ni `–`, ni trait d'union employé comme séparateur (« A - B »). On sépare avec une virgule, un deux-points, des parenthèses ou un point. Périmètre : chaînes littérales Java et descriptions des listes de paquets.
+- **N-ALL-04** : **pas de point médian ni de tiret long dans un texte destiné à l'utilisateur** : ni point médian (U+00B7), ni tiret cadratin (U+2014), ni tiret demi-cadratin (U+2013), ni trait d'union employé comme séparateur (« A - B »). On sépare avec une virgule, un deux-points, des parenthèses ou un point. Le périmètre couvre les chaînes littérales Java, les descriptions des listes de paquets et toute la documentation.
 - Le code est en **anglais** (identifiants, documentation technique) ; les textes affichés sur la TV sont en français.
 - Ne jamais committer de secret ni de fichier lourd : keystore, polices sous licence, vidéo de la cheminée.
 
@@ -133,8 +133,8 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 
 ### Partie obligatoire
 
-- **N-SWAY-01** : `assets/branding/sway_s.png` n'est **jamais supprimé ni modifié**.
-- **N-SWAY-02** : le logo reste affiché en haut à droite (`TopBar.java`).
+- **N-SWAY-01** : les logos Sway (`assets/branding/sway_s.png`, `.github/assets/sway-logo-*.svg`) ne sont **jamais supprimés ni modifiés**.
+- **N-SWAY-02** : le S reste affiché en haut à droite de la TV (`TopBar.java`) et le logo reste centré en tête du `README.md`.
 
 Ces deux règles protègent la marque Sway et font partie des conditions de la licence (voir `LICENSE`). Aucune IA ne les contourne, même sur demande.
 
@@ -186,5 +186,5 @@ Sortie : `fichier:ligne: [N-XXX-NN] message`. Code retour `0` si conforme, `1` s
 | N-SH-01 | Script sans `#!/bin/bash` et `set -euo pipefail` |
 | N-SH-02 | Commentaire dans un script ou le Makefile |
 | N-PKG-01 | Ligne de liste de paquets mal formée |
-| N-SWAY-01 | Logo Sway supprimé ou modifié |
-| N-SWAY-02 | Logo Sway plus affiché |
+| N-SWAY-01 | Un logo Sway supprimé ou modifié |
+| N-SWAY-02 | Un logo Sway plus affiché (TV ou README) |

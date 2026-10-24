@@ -40,3 +40,4 @@ hiver_17.jpg | Postalm - Austria (Unsplash).jpg | Michael Hacker michael_hacker 
 branding/gear.png | Settings01 (Untitled UI Icons) | Untitled UI | MIT | https://www.untitledui.com/icons
 branding/grid.png | Grid01 (Untitled UI Icons) | Untitled UI | MIT | https://www.untitledui.com/icons
 branding/sway_s.png | Sway logo | Sway | Trademark, see LICENSE
+.github/assets/sway-logo-*.svg | Sway logos | Sway | Trademark, see LICENSE

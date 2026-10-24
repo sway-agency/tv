@@ -5,9 +5,16 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SWAY_LOGO = ROOT / "assets/branding/sway_s.png"
-SWAY_LOGO_SHA256 = "3e8802a71c97374dffccf76f6df25348aff3b47d2dafa79685ef1f0c5ec4a7c6"
-SWAY_LOGO_REFERENCE = ("src/fr/sway/accueil/TopBar.java", '"branding/sway_s.png"')
+SWAY_LOGOS = {
+    "assets/branding/sway_s.png": "3e8802a71c97374dffccf76f6df25348aff3b47d2dafa79685ef1f0c5ec4a7c6",
+    ".github/assets/sway-logo-black.svg": "9aea2f5c3d7a3490b31e9340419e17083ce2f1ed23d8edf0088533d77e837851",
+    ".github/assets/sway-logo-white.svg": "3963583ee0b5f077985b9a872f372aa3efcfdb81dc427e7269ca3b1edd7c3bf4",
+}
+SWAY_LOGO_REFERENCES = [
+    ("src/fr/sway/accueil/TopBar.java", '"branding/sway_s.png"'),
+    ("README.md", 'srcset=".github/assets/sway-logo-white.svg"'),
+    ("README.md", 'src=".github/assets/sway-logo-black.svg"'),
+]
 MAX_JAVA_FILE_LINES = 200
 MAX_JAVA_METHOD_LINES = 50
 MAX_UTILITY_METHOD_LINES = 25
@@ -15,12 +22,14 @@ MAX_UTILITY_METHODS = 5
 JAVA_TOP_LEVEL_TYPE = re.compile(r"^(public |final |abstract )*(class|interface|enum) ")
 JAVA_WILDCARD_IMPORT = re.compile(r"^import (static )?[\w.]+\.\*;")
 JAVA_CONDITION_ASSIGNMENT = re.compile(r"\b(if|while)\s*\(.*\(\s*\w+\s*=[^=]")
-FORBIDDEN_DASHES = re.compile(r"[·–—]|\S - \S")
+DASH_GLYPHS = "[\\u00b7\\u2013\\u2014]"
+FORBIDDEN_DASHES = re.compile(DASH_GLYPHS + "|\\S - \\S")
+FORBIDDEN_DOC_DASHES = re.compile(DASH_GLYPHS)
 JAVA_STRING = re.compile(r'"(?:[^"\\]|\\.)*"')
 JAVA_METHOD_START = re.compile(r"^    \S.*\)\s*(throws [\w., ]+)?\{$")
 PACKAGE_LINE = re.compile(r"^[a-z][\w.]*\*? \| \S.*$")
 TEXT_GLOBS = ["src/**/*.java", "scripts/*.sh", "scripts/*.py", "build.sh", "Makefile",
-              "config/**/*.txt", "*.md", ".github/**/*.md", ".github/**/*.yml", "AndroidManifest.xml"]
+              "config/**/*.txt", "*.txt", "*.md", ".github/**/*.md", ".github/**/*.yml", "AndroidManifest.xml"]
 
 errors = []
 
@@ -48,6 +57,11 @@ def check_user_text(path, number, text):
 
 def is_utility_class(path, lines):
     return any(line.strip() == f"private {path.stem}() {{" for line in lines)
+
+def check_documentation(path, lines):
+    for number, line in enumerate(lines, 1):
+        if FORBIDDEN_DOC_DASHES.search(line):
+            report(path, number, "N-ALL-04", "middle dot or en/em dash in documentation")
 
 def check_java_lines(path, lines):
     for number, line in enumerate(lines, 1):
@@ -97,15 +111,16 @@ def check_package_list(path, lines):
         if " | " in line:
             check_user_text(path, number, line.split(" | ", 1)[1])
 
-def check_sway_logo():
-    if not SWAY_LOGO.exists():
-        report(SWAY_LOGO.parent, 0, "N-SWAY-01", "the Sway logo was removed")
-        return
-    if hashlib.sha256(SWAY_LOGO.read_bytes()).hexdigest() != SWAY_LOGO_SHA256:
-        report(SWAY_LOGO, 0, "N-SWAY-01", "the Sway logo was modified")
-    source, reference = SWAY_LOGO_REFERENCE
-    if reference not in (ROOT / source).read_text():
-        report(ROOT / source, 0, "N-SWAY-02", "the Sway logo is no longer displayed")
+def check_sway_logos():
+    for relative, expected in SWAY_LOGOS.items():
+        logo = ROOT / relative
+        if not logo.exists():
+            report(logo.parent, 0, "N-SWAY-01", f"Sway logo {logo.name} was removed")
+        elif hashlib.sha256(logo.read_bytes()).hexdigest() != expected:
+            report(logo, 0, "N-SWAY-01", "Sway logo was modified")
+    for source, reference in SWAY_LOGO_REFERENCES:
+        if reference not in (ROOT / source).read_text():
+            report(ROOT / source, 0, "N-SWAY-02", "Sway logo is no longer displayed")
 
 def files(targets):
     roots = [ROOT / t for t in targets] or [ROOT]
@@ -125,7 +140,9 @@ def main():
             check_shell(path, lines, path.name == "Makefile")
         elif path.parent.name == "packages" and path.suffix == ".txt":
             check_package_list(path, lines)
-    check_sway_logo()
+        elif path.suffix in (".md", ".txt"):
+            check_documentation(path, lines)
+    check_sway_logos()
     print("\n".join(errors) if errors else "Norminette: OK")
     return 1 if errors else 0
 

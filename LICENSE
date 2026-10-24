@@ -22,10 +22,11 @@ SOFTWARE.
 
 Sway branding
 
-The Sway logo (assets/branding/sway_s.png) and the Sway name are trademarks of
-Sway and are not covered by the MIT licence above. You may redistribute the
-logo file only unmodified, as part of this software or a fork of it, displayed
-where the original software displays it. All other rights are reserved.
+The Sway name and logos (assets/branding/sway_s.png, .github/assets/sway-logo-*)
+are trademarks of Sway and are not covered by the MIT licence above. You may
+redistribute these files only unmodified, as part of this software or a fork of
+it, displayed where the original software displays them. All other rights are
+reserved.
 
 Third-party assets (wallpapers, sounds, icons) keep their own licences, listed
 in CREDITS.txt.
