@@ -49,4 +49,6 @@ fix(fireplace): release players when the surface is destroyed
 
 ## Pull requests
 
+Every pull request needs the approval of a code owner listed in `.github/CODEOWNERS` before it can be merged.
+
 Fill in `.github/pull_request_template.md`. CI runs the norminette and a build on every pull request.
