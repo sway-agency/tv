@@ -38,7 +38,7 @@ final class Dock extends LinearLayout {
         for (LauncherApp app : apps) {
             addView(tiles.appTile(app, () -> launcher.accept(app.launchIntent)));
         }
-        addView(tiles.iconTile(AssetImages.bitmap(getContext(), GRID_ASSET), "Applis", "Toutes les applis", onOpenDrawer));
+        addView(tiles.glassTile(AssetImages.bitmap(getContext(), GRID_ASSET), "Apps", "Toutes les apps", onOpenDrawer));
         return true;
     }
 

@@ -10,7 +10,7 @@ import java.util.Random;
 
 final class Grain {
     private static final int TILE = 160;
-    private static final int MAX_ALPHA = 30;
+    private static final int MAX_ALPHA = 12;
     private static final long SEED = 42;
     private static Bitmap tile;
 

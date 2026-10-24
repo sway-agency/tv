@@ -19,7 +19,7 @@ import java.util.List;
 final class AppDrawer extends FrameLayout {
     private static final int COLUMNS = 5;
     private static final long FADE_MILLIS = 200;
-    private static final int TINT = Color.argb(115, 22, 22, 26);
+    private static final int TINT = Color.argb(70, 22, 22, 26);
 
     private final ImageView backdrop;
     private final ScrollView scroll;
@@ -59,8 +59,8 @@ final class AppDrawer extends FrameLayout {
         return getVisibility() == View.VISIBLE;
     }
 
-    void open(List<View> tiles, Bitmap wallpaper) {
-        backdrop.setImageBitmap(Blur.of(wallpaper));
+    void open(List<View> tiles, Bitmap backdropImage) {
+        backdrop.setImageBitmap(backdropImage);
         grid.removeAllViews();
         for (View tile : tiles) {
             grid.addView(tile);
@@ -100,7 +100,7 @@ final class AppDrawer extends FrameLayout {
         TextView title = new TextView(context);
         title.setText("Applications");
         title.setTextColor(Color.WHITE);
-        title.setTypeface(Fonts.satoshi(context.getAssets(), 300));
+        title.setTypeface(Fonts.satoshi(context.getAssets(), 700));
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX, screenHeight / 22f);
         return title;
     }
