@@ -1,0 +1,17 @@
+com.google.android.backdrop | Google ambient screensaver, replaced by the fireplace
+com.google.android.apps.tv.dreamx | Google TV ambient screensaver
+com.android.dreams.basic | Basic colour screensaver
+com.google.android.tvrecommendations | Recommendation rows for the stock launcher
+com.google.android.marvin.talkback | TalkBack screen reader (accessibility)
+com.android.printspooler | Printing service
+com.google.android.syncadapters.calendar | Google Calendar sync
+com.google.android.syncadapters.contacts | Google Contacts sync
+com.android.wallpaperbackup | Wallpaper backup
+com.google.android.partnersetup | Partner setup leftovers
+com.android.companiondevicemanager | Companion device pairing
+com.google.android.feedback | Google feedback reporter
+com.google.android.play.games | Google Play Games
+com.google.android.videos | Google Play Movies
+com.google.android.music | Google Play Music
+com.google.android.youtube.tvmusic | YouTube Music
+com.google.android.youtube.tvkids | YouTube Kids

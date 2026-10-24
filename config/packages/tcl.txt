@@ -1,0 +1,15 @@
+com.tcl.assistant | TCL assistant
+com.tcl.audioplayer | TCL USB music player
+com.tcl.imageplayer | TCL USB photo viewer
+com.tcl.videoplayer | TCL USB video player
+com.tcl.copydatatotv | TCL copy-to-TV tool
+com.tcl.keyhelp | TCL remote help screen
+com.tcl.pvr.pvrplayer | TCL recordings player
+com.tcl.bootadservice | TCL boot advertising
+com.tcl.gallery | TCL gallery
+com.tcl.common.terminalmanagerplus | TCL terminal manager
+uk.co.freeview.* | Freeview UK preloads
+au.com.stan.and | Stan (Australia) preload
+com.linecorp.linetv | LINE TV preload
+com.eros.now | Eros Now preload
+com.graymatrix.did | Graymatrix preload
