@@ -9,6 +9,7 @@ DOCK_RECEIVER="$LAUNCHER/.DockReceiver"
 SCREENSAVER="$LAUNCHER/.FireplaceDream"
 STATE_DIR="$ROOT/state"
 PACKAGE_LISTS="$ROOT/config/packages"
+SENSITIVE_PERMISSIONS="RECORD_AUDIO|CAMERA|ACCESS_FINE_LOCATION|ACCESS_COARSE_LOCATION|ACCESS_BACKGROUND_LOCATION"
 
 adb_tv() {
     if [ -n "${SERIAL:-}" ]; then
@@ -162,14 +163,51 @@ cmd_debloat() {
     shell pm trim-caches 8G
 }
 
+sensitive_grants() {
+    shell dumpsys package | awk -v pattern="android.permission.($SENSITIVE_PERMISSIONS): granted=true" '
+        /^  Package \[/ { name = $2; gsub(/[][]/, "", name) }
+        $0 ~ pattern { split($1, permission, ":"); print name " " permission[1] }' | sort -u
+}
+
+cmd_privacy() {
+    echo "# Camera and microphone hardware"
+    shell pm list features | grep -E "android.hardware.(camera|microphone)" || echo "none reported"
+    echo
+    echo "# Apps allowed to use the microphone, a camera or the location"
+    sensitive_grants
+}
+
+cmd_privacy_lock() {
+    [ "$#" -gt 0 ] || { echo "usage: privacy-lock <package>..." >&2; exit 1; }
+    mkdir -p "$STATE_DIR"
+    local log="$STATE_DIR/$(device_id)-revoked.txt" package permission output
+    while read -r package permission; do
+        [[ " $* " == *" $package "* ]] || continue
+        if output="$(shell pm revoke "$package" "$permission" 2>&1)" && [ -z "$output" ]; then
+            echo "revoked   $package $permission"
+            echo "$package $permission" >> "$log"
+        else
+            echo "skipped   $package $permission (system-fixed)"
+        fi
+    done < <(sensitive_grants)
+}
+
 cmd_restore() {
-    local log
-    log="$(state_file)"
-    [ -f "$log" ] || { echo "Nothing to restore."; return; }
-    while read -r package; do
-        shell pm enable "$package" >/dev/null && echo "enabled   $package"
-    done < "$log"
-    rm "$log"
+    local disabled revoked package permission
+    disabled="$(state_file)"
+    revoked="$STATE_DIR/$(device_id)-revoked.txt"
+    if [ -f "$disabled" ]; then
+        while read -r package; do
+            shell pm enable "$package" >/dev/null && echo "enabled   $package"
+        done < "$disabled"
+        rm "$disabled"
+    fi
+    if [ -f "$revoked" ]; then
+        while read -r package permission; do
+            shell pm grant "$package" "$permission" >/dev/null && echo "granted   $package $permission"
+        done < "$revoked"
+        rm "$revoked"
+    fi
 }
 
 cmd_dock() {
@@ -184,6 +222,7 @@ cmd_dock() {
 command="${1:-}"
 shift || true
 case "$command" in
-    connect|doctor|brand|install|home|screensaver|apps|debloat|restore|dock) "cmd_$command" "$@" ;;
-    *) echo "usage: $0 {connect|doctor|brand|install|home|screensaver|apps|debloat|restore|dock}" >&2; exit 1 ;;
+    connect|doctor|brand|install|home|screensaver|apps|debloat|restore|dock|privacy) "cmd_$command" "$@" ;;
+    privacy-lock) cmd_privacy_lock "$@" ;;
+    *) echo "usage: $0 {connect|doctor|brand|install|home|screensaver|apps|debloat|restore|dock|privacy|privacy-lock}" >&2; exit 1 ;;
 esac
