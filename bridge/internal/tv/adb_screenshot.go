@@ -11,14 +11,23 @@ import (
 )
 
 const (
-	screenshotMaxWidth = 960
-	screenshotQuality  = 80
+	screenshotMaxWidth  = 960
+	screenshotQuality   = 80
+	screenshotMaxSource = 3840
 )
 
 func (a *ADB) Screenshot(ctx context.Context) ([]byte, error) {
 	raw, err := a.run(ctx, "exec-out", "screencap", "-p")
 	if err != nil {
 		return nil, err
+	}
+	return compressScreenshot(raw)
+}
+
+func compressScreenshot(raw []byte) ([]byte, error) {
+	header, err := png.DecodeConfig(bytes.NewReader(raw))
+	if err != nil || header.Width > screenshotMaxSource || header.Height > screenshotMaxSource {
+		return nil, fmt.Errorf("%w: unexpected screenshot size", ErrCommandFailed)
 	}
 	screen, err := png.Decode(bytes.NewReader(raw))
 	if err != nil {

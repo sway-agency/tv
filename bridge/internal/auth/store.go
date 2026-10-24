@@ -3,14 +3,22 @@ package auth
 import (
 	"crypto/subtle"
 	"strings"
+	"sync"
 )
 
 type Store struct {
+	mu     sync.RWMutex
 	tokens []Token
 }
 
 func NewStore(tokens []Token) *Store {
 	return &Store{tokens: tokens}
+}
+
+func (s *Store) Replace(tokens []Token) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.tokens = tokens
 }
 
 func (s *Store) Authenticate(authorization string) (Token, bool) {
@@ -19,6 +27,8 @@ func (s *Store) Authenticate(authorization string) (Token, bool) {
 		return Token{}, false
 	}
 	presented := []byte(Hash(plain))
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	var matched Token
 	ok := false
 	for _, token := range s.tokens {
@@ -30,5 +40,7 @@ func (s *Store) Authenticate(authorization string) (Token, bool) {
 }
 
 func (s *Store) Len() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	return len(s.tokens)
 }

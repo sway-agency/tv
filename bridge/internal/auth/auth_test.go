@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -67,5 +68,34 @@ func TestLockout(t *testing.T) {
 	now = now.Add(2 * time.Hour)
 	if lockout.Locked("10.0.0.2") {
 		t.Fatal("lockout never expires")
+	}
+}
+
+func TestLockoutKeepsActiveLocksWhenFull(t *testing.T) {
+	now := time.Unix(0, 0)
+	lockout := NewLockout(1, time.Minute, time.Hour)
+	lockout.now = func() time.Time { return now }
+	lockout.Fail("attacker")
+	for i := range maxTrackedKeys {
+		lockout.Fail(fmt.Sprintf("10.0.%d.%d", i/256, i%256))
+	}
+	if !lockout.Locked("attacker") {
+		t.Fatal("flooding the table must not lift an active lock")
+	}
+	if !lockout.Locked("192.168.1.50") {
+		t.Fatal("a saturated table must refuse unknown addresses")
+	}
+}
+
+func TestStoreReplaceRevokesTokens(t *testing.T) {
+	plain, token, err := NewToken("phone", []Scope{ScopeControl})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := NewStore([]Token{token})
+	store.Replace(nil)
+	_, ok := store.Authenticate("Bearer " + plain)
+	if ok {
+		t.Fatal("revoked token still accepted")
 	}
 }

@@ -29,7 +29,10 @@ func (l *Lockout) Locked(address string) bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	current, found := l.byAddress[address]
-	return found && l.now().Before(current.lockedUntil)
+	if !found {
+		return len(l.byAddress) >= maxTrackedKeys
+	}
+	return l.now().Before(current.lockedUntil)
 }
 
 func (l *Lockout) Fail(address string) {
@@ -38,14 +41,32 @@ func (l *Lockout) Fail(address string) {
 	now := l.now()
 	current, found := l.byAddress[address]
 	if !found || now.Sub(current.windowStart) > l.window {
-		if len(l.byAddress) >= maxTrackedKeys {
-			l.byAddress = map[string]*attempts{}
+		if !found && len(l.byAddress) >= maxTrackedKeys {
+			l.pruneExpired(now)
 		}
-		current = &attempts{windowStart: now}
+		if !found && len(l.byAddress) >= maxTrackedKeys {
+			return
+		}
+		current = &attempts{windowStart: now, lockedUntil: currentLock(current)}
 		l.byAddress[address] = current
 	}
 	current.count++
 	if current.count >= l.maxFailures {
 		current.lockedUntil = now.Add(l.duration)
 	}
+}
+
+func (l *Lockout) pruneExpired(now time.Time) {
+	for address, entry := range l.byAddress {
+		if now.Sub(entry.windowStart) > l.window && !now.Before(entry.lockedUntil) {
+			delete(l.byAddress, address)
+		}
+	}
+}
+
+func currentLock(previous *attempts) time.Time {
+	if previous == nil {
+		return time.Time{}
+	}
+	return previous.lockedUntil
 }

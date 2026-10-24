@@ -42,7 +42,12 @@ func runToken(args []string) error {
 		if len(settings.Tokens) == before {
 			return fmt.Errorf("no token named %q", *name)
 		}
-		return config.Save(path, settings)
+		err = config.Save(path, settings)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Revoked %s. A running bridge refuses it within 2 seconds.\n", *name)
+		return nil
 	}
 	return fmt.Errorf("unknown token command %q", args[0])
 }

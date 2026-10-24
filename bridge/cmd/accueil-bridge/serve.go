@@ -22,7 +22,14 @@ import (
 )
 
 func runServe(args []string) error {
-	settings, err := loadSettings("serve", args)
+	flags := flag.NewFlagSet("serve", flag.ContinueOnError)
+	dir := flags.String("dir", defaultDir(), "configuration directory")
+	err := flags.Parse(args)
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(*dir, "config.json")
+	settings, err := config.Load(path)
 	if err != nil {
 		return err
 	}
@@ -31,12 +38,14 @@ func runServe(args []string) error {
 	}
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
 	dispatcher := mcp.NewDispatcher(tv.NewADB(settings.ADBPath, settings.TVSerial), version)
-	httpServer, err := server.New(settings, dispatcher, logger)
+	store := auth.NewStore(settings.Tokens)
+	httpServer, err := server.New(settings, dispatcher, store, logger)
 	if err != nil {
 		return err
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	go server.WatchTokens(ctx, path, store, logger)
 	go func() {
 		<-ctx.Done()
 		shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -92,14 +101,4 @@ func runCert(args []string) error {
 	}
 	fmt.Printf("Created client-%s.pem and client-%s-key.pem in %s. Set require_client_cert to true to enforce them.\n", *name, *name, *dir)
 	return nil
-}
-
-func loadSettings(name string, args []string) (config.Config, error) {
-	flags := flag.NewFlagSet(name, flag.ContinueOnError)
-	dir := flags.String("dir", defaultDir(), "configuration directory")
-	err := flags.Parse(args)
-	if err != nil {
-		return config.Config{}, err
-	}
-	return config.Load(filepath.Join(*dir, "config.json"))
 }

@@ -1,8 +1,11 @@
 package tv
 
 import (
+	"bytes"
 	"image"
 	"image/color"
+	"image/jpeg"
+	"image/png"
 	"testing"
 )
 
@@ -25,5 +28,33 @@ func BenchmarkHalve(b *testing.B) {
 	b.ReportAllocs()
 	for b.Loop() {
 		halve(source)
+	}
+}
+
+func TestCompressScreenshotRejectsOversizedImages(t *testing.T) {
+	var encoded bytes.Buffer
+	err := png.Encode(&encoded, image.NewRGBA(image.Rect(0, 0, screenshotMaxSource+1, 1)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = compressScreenshot(encoded.Bytes())
+	if err == nil {
+		t.Fatal("oversized screenshot accepted")
+	}
+}
+
+func TestCompressScreenshotShrinksToJPEG(t *testing.T) {
+	var encoded bytes.Buffer
+	err := png.Encode(&encoded, image.NewRGBA(image.Rect(0, 0, 1920, 1080)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	jpegData, err := compressScreenshot(encoded.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	config, err := jpeg.DecodeConfig(bytes.NewReader(jpegData))
+	if err != nil || config.Width != screenshotMaxWidth {
+		t.Fatalf("expected a %d px JPEG, got %+v %v", screenshotMaxWidth, config, err)
 	}
 }

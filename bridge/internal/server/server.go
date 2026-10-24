@@ -20,14 +20,14 @@ const (
 	lockoutDuration = 30 * time.Minute
 )
 
-func New(settings config.Config, dispatcher *mcp.Dispatcher, logger *slog.Logger) (*http.Server, error) {
+func New(settings config.Config, dispatcher *mcp.Dispatcher, store *auth.Store, logger *slog.Logger) (*http.Server, error) {
 	tlsSettings, err := tlsConfig(settings)
 	if err != nil {
 		return nil, err
 	}
 	handlers := &handler{
 		dispatcher: dispatcher,
-		store:      auth.NewStore(settings.Tokens),
+		store:      store,
 		limiter:    auth.NewLimiter(settings.RateLimitPerSecond, settings.RateLimitBurst),
 		lockout:    auth.NewLockout(maxFailures, failureWindow, lockoutDuration),
 		logger:     logger,

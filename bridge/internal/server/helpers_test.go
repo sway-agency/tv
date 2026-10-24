@@ -47,7 +47,7 @@ func startBridge(t *testing.T, scopes ...auth.Scope) testBridge {
 		RateLimitPerSecond: 50, RateLimitBurst: 50, Tokens: []auth.Token{token},
 	}
 	mock := tv.NewMock("com.netflix.ninja")
-	httpServer, err := New(settings, mcp.NewDispatcher(mock, "test"), slog.New(slog.NewTextHandler(io.Discard, nil)))
+	httpServer, err := New(settings, mcp.NewDispatcher(mock, "test"), auth.NewStore(settings.Tokens), slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
 		t.Fatal(err)
 	}
