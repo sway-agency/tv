@@ -96,11 +96,6 @@ final class WallpaperRotator {
                 .setDuration(DISPLAY_MILLIS + FADE_MILLIS).start();
     }
 
-    Bitmap current() {
-        Drawable drawable = (frontVisible ? frontLayer : backLayer).getDrawable();
-        return drawable instanceof BitmapDrawable ? ((BitmapDrawable) drawable).getBitmap() : null;
-    }
-
     private void release(ImageView layer) {
         Drawable drawable = layer.getDrawable();
         layer.setImageDrawable(null);

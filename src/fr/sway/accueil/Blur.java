@@ -1,29 +1,35 @@
 package fr.sway.accueil;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.view.View;
 
 final class Blur {
-    private static final int WIDTH = 160;
-    private static final int RADIUS = 3;
-    private static final int PASSES = 3;
+    private static final int WIDTH = 480;
+    private static final int RADIUS = 2;
+    private static final int PASSES = 2;
 
     private Blur() {
     }
 
-    static Bitmap of(Bitmap source) {
-        if (source == null) {
+    static Bitmap of(View view) {
+        if (view.getWidth() == 0 || view.getHeight() == 0) {
             return null;
         }
-        int height = Math.max(1, WIDTH * source.getHeight() / source.getWidth());
-        Bitmap small = Bitmap.createScaledBitmap(source, WIDTH, height, true).copy(Bitmap.Config.ARGB_8888, true);
+        float scale = (float) WIDTH / view.getWidth();
+        int height = Math.max(1, Math.round(view.getHeight() * scale));
+        Bitmap snapshot = Bitmap.createBitmap(WIDTH, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(snapshot);
+        canvas.scale(scale, scale);
+        view.draw(canvas);
         int[] pixels = new int[WIDTH * height];
-        small.getPixels(pixels, 0, WIDTH, 0, 0, WIDTH, height);
+        snapshot.getPixels(pixels, 0, WIDTH, 0, 0, WIDTH, height);
         for (int pass = 0; pass < PASSES; pass++) {
             pixels = boxPass(pixels, WIDTH, height, 1, 0);
             pixels = boxPass(pixels, WIDTH, height, 0, 1);
         }
-        small.setPixels(pixels, 0, WIDTH, 0, 0, WIDTH, height);
-        return small;
+        snapshot.setPixels(pixels, 0, WIDTH, 0, 0, WIDTH, height);
+        return snapshot;
     }
 
     private static int[] boxPass(int[] source, int width, int height, int stepX, int stepY) {
