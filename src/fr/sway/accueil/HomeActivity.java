@@ -121,7 +121,7 @@ public class HomeActivity extends Activity {
             }
         }
         dock.setBlocked(true);
-        drawer.open(drawerTiles);
+        drawer.open(drawerTiles, wallpaperRotator.current());
     }
 
     private void closeDrawer() {
