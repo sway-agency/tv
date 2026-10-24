@@ -25,8 +25,6 @@ public class HomeActivity extends Activity {
     private SnowView snow;
     private Dock dock;
     private AppDrawer drawer;
-    private FrameLayout root;
-    private boolean focusFirstOnResume;
     private PackageChanges packageChanges;
     private List<View> drawerTiles = new ArrayList<>();
     private int drawerVersion = -1;
@@ -43,7 +41,7 @@ public class HomeActivity extends Activity {
         dockConfig = new DockConfig(this);
         tiles = new TileFactory(this, screenWidth * 12 / 100);
 
-        root = new FrameLayout(this);
+        FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
         root.setClipChildren(false);
         ImageView backLayer = wallpaperLayer();
@@ -70,10 +68,6 @@ public class HomeActivity extends Activity {
     protected void onResume() {
         super.onResume();
         populateDock();
-        if (focusFirstOnResume) {
-            focusFirstOnResume = false;
-            dock.post(dock::focusFirst);
-        }
         Motion.riseIn(dock, screenHeight / 12f);
         wallpaperRotator.start();
         snow.start();
@@ -96,7 +90,7 @@ public class HomeActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         closeDrawer();
-        focusFirstOnResume = true;
+        dock.focusFirst();
     }
 
     @Override
@@ -127,7 +121,7 @@ public class HomeActivity extends Activity {
             }
         }
         dock.setBlocked(true);
-        drawer.open(drawerTiles, Blur.of(root));
+        drawer.open(drawerTiles);
     }
 
     private void closeDrawer() {

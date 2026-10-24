@@ -22,8 +22,8 @@
 </p>
 
 <p align="center">
-  <img src=".github/assets/screenshot-home.jpg" alt="Accueil Android TV launcher home screen with app dock, glass Apps button and snowy mountain wallpaper" width="49%">
-  <img src=".github/assets/screenshot-apps.jpg" alt="Accueil Android TV launcher app grid on a frosted glass backdrop" width="49%">
+  <img src=".github/assets/screenshot-home.jpg" alt="Accueil Android TV launcher home screen with app dock, clock and winter wallpaper" width="49%">
+  <img src=".github/assets/screenshot-apps.jpg" alt="Accueil Android TV launcher app grid with fireplace app" width="49%">
 </p>
 
 ## Why Accueil?
