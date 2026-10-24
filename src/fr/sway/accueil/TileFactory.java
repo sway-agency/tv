@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -38,11 +39,11 @@ final class TileFactory {
         ImageView image = new ImageView(context);
         if (app.banner != null) {
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            image.setImageDrawable(app.banner);
+            image.setImageDrawable(ownCopy(app.banner));
             card.addView(image, new FrameLayout.LayoutParams(tileWidth, tileHeight));
         } else {
             image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            image.setImageDrawable(app.icon);
+            image.setImageDrawable(ownCopy(app.icon));
             int iconSize = tileHeight / 2;
             card.addView(image, new FrameLayout.LayoutParams(iconSize, iconSize, Gravity.CENTER));
         }
@@ -71,6 +72,11 @@ final class TileFactory {
 
         card.addView(content, new FrameLayout.LayoutParams(tileWidth, tileHeight));
         return wrap(card, caption, onClick);
+    }
+
+    private static Drawable ownCopy(Drawable shared) {
+        Drawable.ConstantState state = shared == null ? null : shared.getConstantState();
+        return state == null ? shared : state.newDrawable();
     }
 
     private FrameLayout card(int fillColor) {

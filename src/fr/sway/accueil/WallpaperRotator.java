@@ -3,6 +3,8 @@ package fr.sway.accueil;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -29,6 +31,7 @@ final class WallpaperRotator {
     private final Runnable advance = this::showNext;
     private int nextIndex;
     private boolean frontVisible;
+    private Bitmap spare;
 
     WallpaperRotator(AssetManager assets, ImageView backLayer, ImageView frontLayer) {
         this.assets = assets;
@@ -58,6 +61,7 @@ final class WallpaperRotator {
 
     void stop() {
         handler.removeCallbacks(advance);
+        spare = null;
     }
 
     private void showNext() {
@@ -66,12 +70,12 @@ final class WallpaperRotator {
             backLayer.setImageBitmap(next);
             drift(backLayer);
             frontLayer.animate().alpha(0f).setDuration(FADE_MILLIS)
-                    .withEndAction(() -> frontLayer.setImageDrawable(null)).start();
+                    .withEndAction(() -> release(frontLayer)).start();
         } else {
             frontLayer.setImageBitmap(next);
             drift(frontLayer);
             frontLayer.animate().alpha(1f).setDuration(FADE_MILLIS)
-                    .withEndAction(() -> backLayer.setImageDrawable(null)).start();
+                    .withEndAction(() -> release(backLayer)).start();
         }
         frontVisible = !frontVisible;
         handler.postDelayed(advance, DISPLAY_MILLIS);
@@ -92,9 +96,31 @@ final class WallpaperRotator {
                 .setDuration(DISPLAY_MILLIS + FADE_MILLIS).start();
     }
 
+    private void release(ImageView layer) {
+        Drawable drawable = layer.getDrawable();
+        layer.setImageDrawable(null);
+        if (drawable instanceof BitmapDrawable) {
+            spare = ((BitmapDrawable) drawable).getBitmap();
+        }
+    }
+
     private Bitmap decode(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inMutable = true;
+        options.inBitmap = spare;
+        spare = null;
+        try (InputStream stream = assets.open(path)) {
+            return BitmapFactory.decodeStream(stream, null, options);
+        } catch (IllegalArgumentException e) {
+            options.inBitmap = null;
+            return decodeFresh(path, options);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private Bitmap decodeFresh(String path, BitmapFactory.Options options) {
         try (InputStream stream = assets.open(path)) {
             return BitmapFactory.decodeStream(stream, null, options);
         } catch (IOException e) {
