@@ -7,7 +7,7 @@ import (
 )
 
 func (h *handler) authenticate(writer http.ResponseWriter, request *http.Request) (mcp.Caller, bool) {
-	address := clientAddress(request)
+	address := lockoutKey(clientAddress(request))
 	if h.lockout.Locked(address) {
 		h.logger.Warn("locked out", "address", address)
 		http.Error(writer, "too many failed attempts", http.StatusTooManyRequests)

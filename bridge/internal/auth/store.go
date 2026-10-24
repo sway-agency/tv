@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/subtle"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -37,6 +38,12 @@ func (s *Store) Authenticate(authorization string) (Token, bool) {
 		}
 	}
 	return matched, ok
+}
+
+func (s *Store) Tokens() []Token {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return slices.Clone(s.tokens)
 }
 
 func (s *Store) Len() int {

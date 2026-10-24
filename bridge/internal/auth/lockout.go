@@ -28,11 +28,15 @@ func NewLockout(maxFailures int, window time.Duration, duration time.Duration) *
 func (l *Lockout) Locked(address string) bool {
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	now := l.now()
 	current, found := l.byAddress[address]
-	if !found {
-		return len(l.byAddress) >= maxTrackedKeys
+	if found {
+		return now.Before(current.lockedUntil)
 	}
-	return l.now().Before(current.lockedUntil)
+	if len(l.byAddress) >= maxTrackedKeys {
+		l.pruneExpired(now)
+	}
+	return len(l.byAddress) >= maxTrackedKeys
 }
 
 func (l *Lockout) Fail(address string) {

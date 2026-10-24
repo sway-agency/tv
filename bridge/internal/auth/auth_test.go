@@ -99,3 +99,19 @@ func TestStoreReplaceRevokesTokens(t *testing.T) {
 		t.Fatal("revoked token still accepted")
 	}
 }
+
+func TestLockoutRecoversOnceEntriesExpire(t *testing.T) {
+	now := time.Unix(0, 0)
+	lockout := NewLockout(1, time.Minute, time.Minute)
+	lockout.now = func() time.Time { return now }
+	for i := range maxTrackedKeys {
+		lockout.Fail(fmt.Sprintf("10.1.%d.%d", i/256, i%256))
+	}
+	if !lockout.Locked("192.168.1.50") {
+		t.Fatal("a table full of active locks must refuse unknown addresses")
+	}
+	now = now.Add(time.Hour)
+	if lockout.Locked("192.168.1.50") {
+		t.Fatal("expired entries must be pruned so unknown addresses recover")
+	}
+}

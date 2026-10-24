@@ -44,6 +44,14 @@ func originAllowed(allowed []string, origin string) bool {
 	return origin == "" || slices.Contains(allowed, origin)
 }
 
+func lockoutKey(address string) string {
+	ip := net.ParseIP(address)
+	if ip == nil || ip.To4() != nil {
+		return address
+	}
+	return ip.Mask(net.CIDRMask(64, 128)).String() + "/64"
+}
+
 func clientAddress(request *http.Request) string {
 	host, _, err := net.SplitHostPort(request.RemoteAddr)
 	if err != nil {

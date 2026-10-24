@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"log/slog"
-	"os"
+	"slices"
 	"time"
 
 	"github.com/sway-agency/tv/bridge/internal/auth"
@@ -13,7 +13,6 @@ import (
 const reloadInterval = 2 * time.Second
 
 func WatchTokens(ctx context.Context, path string, store *auth.Store, logger *slog.Logger) {
-	lastChange := modified(path)
 	ticker := time.NewTicker(reloadInterval)
 	defer ticker.Stop()
 	for {
@@ -22,26 +21,38 @@ func WatchTokens(ctx context.Context, path string, store *auth.Store, logger *sl
 			return
 		case <-ticker.C:
 		}
-		change := modified(path)
-		if change.Equal(lastChange) {
-			continue
-		}
-		lastChange = change
-		settings, err := config.Load(path)
-		if err != nil {
-			store.Replace(nil)
-			logger.Error("configuration rejected, every token is refused until it is fixed", "error", err)
-			continue
-		}
-		store.Replace(settings.Tokens)
-		logger.Info("tokens reloaded", "count", len(settings.Tokens))
+		reloadTokens(path, store, logger)
 	}
 }
 
-func modified(path string) time.Time {
-	info, err := os.Stat(path)
+func reloadTokens(path string, store *auth.Store, logger *slog.Logger) {
+	settings, err := config.Load(path)
 	if err != nil {
-		return time.Time{}
+		if store.Len() > 0 {
+			logger.Error("configuration rejected, every token is refused until it is fixed", "error", err)
+		}
+		store.Replace(nil)
+		return
 	}
-	return info.ModTime()
+	if !slices.Equal(fingerprint(store.Tokens()), fingerprint(settings.Tokens)) {
+		logger.Info("tokens reloaded", "count", len(settings.Tokens))
+	}
+	store.Replace(settings.Tokens)
+}
+
+func fingerprint(tokens []auth.Token) []string {
+	hashes := make([]string, 0, len(tokens))
+	for _, token := range tokens {
+		hashes = append(hashes, token.Name+":"+token.SHA256+":"+scopeList(token.Scopes))
+	}
+	slices.Sort(hashes)
+	return hashes
+}
+
+func scopeList(scopes []auth.Scope) string {
+	joined := ""
+	for _, scope := range scopes {
+		joined += string(scope) + ","
+	}
+	return joined
 }
