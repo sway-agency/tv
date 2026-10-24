@@ -1,0 +1,42 @@
+nature_01.jpg | Lakselvbukt, Troms, Norway.png | Mramoeba | CC0 | https://commons.wikimedia.org/wiki/File:Lakselvbukt,_Troms,_Norway.png
+nature_02.jpg | Marmolada, Italy.jpg | Marco Bonomo | CC0 | https://commons.wikimedia.org/wiki/File:Marmolada,_Italy.jpg
+nature_03.jpg | Northern Lights Ontario (Unsplash).jpg | Scott Rock scottrockphoto | CC0 | https://commons.wikimedia.org/wiki/File:Northern_Lights_Ontario_(Unsplash).jpg
+nature_04.jpg | Heavy fog above a forest (Unsplash).jpg | Thomas Griesbeck jack_scorner | CC0 | https://commons.wikimedia.org/wiki/File:Heavy_fog_above_a_forest_(Unsplash).jpg
+nature_07.jpg | Peaceful mountain lake (Unsplash).jpg | Héctor J. Rivas hjrc33 | CC0 | https://commons.wikimedia.org/wiki/File:Peaceful_mountain_lake_(Unsplash).jpg
+nature_09.jpg | Mountain-View (Unsplash).jpg | Fabian Schneiter photophil | CC0 | https://commons.wikimedia.org/wiki/File:Mountain-View_(Unsplash).jpg
+nature_11.jpg | Evergreen forest in snow (Unsplash).jpg | Dorel Gnatiuc gnatiucdorel | CC0 | https://commons.wikimedia.org/wiki/File:Evergreen_forest_in_snow_(Unsplash).jpg
+nature_12.jpg | Alpine landscape (Unsplash).jpg | Micah. H micah_hallahan | CC0 | https://commons.wikimedia.org/wiki/File:Alpine_landscape_(Unsplash).jpg
+fireplace/fire.mp4 | Fire آتش 02.ogv | Mostafameraji | CC0 | https://commons.wikimedia.org/wiki/File:Fire_آتش_02.ogv
+fireplace/crackle.m4a | Bones breaking wood fire ice crackling.ogg | stephan | Public domain | https://commons.wikimedia.org/wiki/File:Bones_breaking_wood_fire_ice_crackling.ogg
+noel_01.jpg | Beaulieu Christmas Trees (Unsplash).jpg | Annie Spratt anniespratt | CC0 | https://commons.wikimedia.org/wiki/File:Beaulieu_Christmas_Trees_(Unsplash).jpg
+noel_02.jpg | Christmas tree (Unsplash).jpg | Catherine Zaidova catherinezaidova | CC0 | https://commons.wikimedia.org/wiki/File:Christmas_tree_(Unsplash).jpg
+noel_03.jpg | Xmas4 (Unsplash).jpg | Joanna Kosinska joannakosinska | CC0 | https://commons.wikimedia.org/wiki/File:Xmas4_(Unsplash).jpg
+noel_04.jpg | Christmas (Unsplash).jpg | Joanna Kosinska joannakosinska | CC0 | https://commons.wikimedia.org/wiki/File:Christmas_(Unsplash).jpg
+noel_05.jpg | Christmas decorations in flatlay (Unsplash).jpg | Annie Spratt anniespratt | CC0 | https://commons.wikimedia.org/wiki/File:Christmas_decorations_in_flatlay_(Unsplash).jpg
+noel_06.jpg | Cozy Christmas coffee (Unsplash).jpg | Toa Heftiba heftiba | CC0 | https://commons.wikimedia.org/wiki/File:Cozy_Christmas_coffee_(Unsplash).jpg
+noel_07.jpg | Frankenmuth, United States (Unsplash).jpg | Aaron Burden aaronburden | CC0 | https://commons.wikimedia.org/wiki/File:Frankenmuth,_United_States_(Unsplash).jpg
+noel_08.jpg | Innsbruck, Austria (Unsplash cD4GC09BtiA).jpg | Jez Timms jeztimms | CC0 | https://commons.wikimedia.org/wiki/File:Innsbruck,_Austria_(Unsplash_cD4GC09BtiA).jpg
+noel_09.jpg | Leeds, United Kingdom (Unsplash Lsb0agj-gBQ).jpg | Joanna Kosinska joannakosinska | CC0 | https://commons.wikimedia.org/wiki/File:Leeds,_United_Kingdom_(Unsplash_Lsb0agj-gBQ).jpg
+noel_10.jpg | Snowmen at Christmas (Unsplash).jpg | Jeffrey Wegrzyn jeffreymwegrzyn | CC0 | https://commons.wikimedia.org/wiki/File:Snowmen_at_Christmas_(Unsplash).jpg
+noel_11.jpg | Les Anderson 2016-12-22 (Unsplash 7QuEYNRNUeA).jpg | Les Anderson lesanderson | CC0 | https://commons.wikimedia.org/wiki/File:Les_Anderson_2016-12-22_(Unsplash_7QuEYNRNUeA).jpg
+noel_12.jpg | Paper snowflakes (Unsplash).jpg | Kelly Sikkema kelsikkema | CC0 | https://commons.wikimedia.org/wiki/File:Paper_snowflakes_(Unsplash).jpg
+hiver_01.jpg | Snowy village and mountains (Unsplash).jpg | Toa Heftiba heftiba | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_village_and_mountains_(Unsplash).jpg
+hiver_02.jpg | Snowy Dolomite town (Unsplash UDbwmPZvKd8).jpg | Mira Bozhko miroslava | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_Dolomite_town_(Unsplash_UDbwmPZvKd8).jpg
+hiver_03.jpg | Snowy mountains at dusk (Unsplash).jpg | Nitish Meena nitishm | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_mountains_at_dusk_(Unsplash).jpg
+hiver_04.jpg | Snowy mountains in Tirol, Austria (Unsplash).jpg | Bart Prins bartprins | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_mountains_in_Tirol,_Austria_(Unsplash).jpg
+hiver_05.jpg | Snowy mountains in Valloire (Unsplash).jpg | Marc Guellerin mguellerin | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_mountains_in_Valloire_(Unsplash).jpg
+hiver_06.jpg | Sunrise Bettmerhorn snowy mountains (Unsplash).jpg | Sam Ferrara samferrara | CC0 | https://commons.wikimedia.org/wiki/File:Sunrise_Bettmerhorn_snowy_mountains_(Unsplash).jpg
+hiver_07.jpg | Night view of snow covered Val-d'lsère (Unsplash).jpg | Jérôme Prax jeromeprax | CC0 | https://commons.wikimedia.org/wiki/File:Night_view_of_snow_covered_Val-d%27ls%C3%A8re_(Unsplash).jpg
+hiver_08.jpg | Landshuter Europahütte (Unsplash).jpg | Wolfgang Lutz wolfi | CC0 | https://commons.wikimedia.org/wiki/File:Landshuter_Europah%C3%BCtte_(Unsplash).jpg
+hiver_09.jpg | A cabin among the snowy forest (Unsplash).jpg | Gérôme Bruneau geromebruneau | CC0 | https://commons.wikimedia.org/wiki/File:A_cabin_among_the_snowy_forest_(Unsplash).jpg
+hiver_10.jpg | A wood cabin in the snow (Unsplash).jpg | Patrick Tomasso impatrickt | CC0 | https://commons.wikimedia.org/wiki/File:A_wood_cabin_in_the_snow_(Unsplash).jpg
+hiver_11.jpg | Snowy cabin in the woods (Unsplash).jpg | Ales Krivec aleskrivec | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_cabin_in_the_woods_(Unsplash).jpg
+hiver_12.jpg | Frozen winter forest (Unsplash).jpg | Les Anderson lesanderson | CC0 | https://commons.wikimedia.org/wiki/File:Frozen_winter_forest_(Unsplash).jpg
+hiver_13.jpg | Snow Forest Winter Gäddede (Unsplash 3BWzjqbMlDk).jpg | Jon Flobrant jonflobrant | CC0 | https://commons.wikimedia.org/wiki/File:Snow_Forest_Winter_G%C3%A4ddede_(Unsplash_3BWzjqbMlDk).jpg
+hiver_14.jpg | Snow covered forest in Austria (Unsplash).jpg | Emily Morter emilymorter | CC0 | https://commons.wikimedia.org/wiki/File:Snow_covered_forest_in_Austria_(Unsplash).jpg
+hiver_15.jpg | Snow covered mountain reflection (Unsplash).jpg | Evan Kirby evankirby2 | CC0 | https://commons.wikimedia.org/wiki/File:Snow_covered_mountain_reflection_(Unsplash).jpg
+hiver_16.jpg | Snowy Mountains France (Unsplash).jpg | Xavi Garcia thexav | CC0 | https://commons.wikimedia.org/wiki/File:Snowy_Mountains_France_(Unsplash).jpg
+hiver_17.jpg | Postalm - Austria (Unsplash).jpg | Michael Hacker michael_hacker | CC0 | https://commons.wikimedia.org/wiki/File:Postalm_-_Austria_(Unsplash).jpg
+branding/gear.png | Settings01 (Untitled UI Icons) | Untitled UI | MIT | https://www.untitledui.com/icons
+branding/grid.png | Grid01 (Untitled UI Icons) | Untitled UI | MIT | https://www.untitledui.com/icons
+branding/sway_s.png | Sway logo | Sway | Trademark, see LICENSE
