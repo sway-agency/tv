@@ -48,7 +48,7 @@ When the TV brand has no `config/packages/<brand>.txt`:
 | --- | --- |
 | `src/.../HomeActivity.java` | Home screen: wallpaper, dock, drawer wiring |
 | `src/.../TopBar.java` | Clock, settings button, Sway logo |
-| `src/.../DockConfig.java` | Dock packages, set over adb with `--esa dock` |
+| `src/.../DockReceiver.java`, `DockConfig.java` | Dock packages, set by `make dock` through a receiver only adb can reach |
 | `src/.../AppCatalog.java` | Lists TV apps, adds the fireplace tile |
 | `src/.../FireplaceView.java` | Looping video and crackle, shared by the app and the screensaver |
 | `scripts/tv.sh` | All adb operations |

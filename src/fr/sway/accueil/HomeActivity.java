@@ -36,7 +36,6 @@ public class HomeActivity extends Activity {
         screenHeight = getResources().getDisplayMetrics().heightPixels;
         catalog = new AppCatalog(this);
         dockConfig = new DockConfig(this);
-        dockConfig.applyIntent(getIntent());
         tiles = new TileFactory(this, screenWidth * 12 / 100);
 
         FrameLayout root = new FrameLayout(this);
@@ -81,7 +80,6 @@ public class HomeActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        dockConfig.applyIntent(intent);
         closeDrawer();
         focusFirstDockTile();
     }

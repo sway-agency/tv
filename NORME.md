@@ -95,7 +95,7 @@ Chaque règle porte un code (`N-XXX-NN`) affiché par la norminette.
 - Les `Activity` et `DreamService` restent **minces** : elles assemblent des vues construites par des classes dédiées.
 - Les classes sont `final` et **package-private**, sauf quand Android exige `public` (activités, services).
 - Les tailles sont **dérivées de l'écran** (`screenHeight / 14`), jamais des pixels en dur.
-- Une configuration modifiable sans recompiler passe par un `Intent` extra stocké en `SharedPreferences` (modèle : `DockConfig`).
+- Une configuration modifiable sans recompiler passe par un `BroadcastReceiver` protégé par `android.permission.DUMP` (seul adb peut l'appeler), validée puis stockée en `SharedPreferences` (modèle : `DockReceiver` et `DockConfig`). Jamais par un extra reçu par une activité exportée.
 - Les assets optionnels (police, logo, vidéo) ont toujours un **repli** : l'app fonctionne sans eux.
 
 ### Partie conseillée

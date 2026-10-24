@@ -35,6 +35,11 @@
             android:label="Cheminée"
             android:screenOrientation="landscape" />
 
+        <receiver
+            android:name=".DockReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+
         <service
             android:name=".FireplaceDream"
             android:exported="true"

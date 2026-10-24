@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APK="$ROOT/build/accueil.apk"
 LAUNCHER="fr.sway.accueil"
 HOME_ACTIVITY="$LAUNCHER/.HomeActivity"
+DOCK_RECEIVER="$LAUNCHER/.DockReceiver"
 SCREENSAVER="$LAUNCHER/.FireplaceDream"
 STATE_DIR="$ROOT/state"
 PACKAGE_LISTS="$ROOT/config/packages"
@@ -124,7 +125,7 @@ cmd_install() {
 cmd_home() {
     shell cmd package set-home-activity "$HOME_ACTIVITY" >/dev/null
     disable $(matching_installed "$ROOT/config/launchers.txt")
-    shell am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null
+    shell am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
     echo "Accueil is now the home screen."
 }
 
@@ -175,7 +176,8 @@ cmd_dock() {
     [ "$#" -gt 0 ] || { echo "usage: dock <package>..." >&2; exit 1; }
     local joined
     joined="$(IFS=,; echo "$*")"
-    shell am start -n "$HOME_ACTIVITY" --esa dock "$joined" >/dev/null
+    shell am broadcast -n "$DOCK_RECEIVER" --esa dock "$joined" >/dev/null
+    shell am start -a android.intent.action.MAIN -c android.intent.category.HOME >/dev/null 2>&1
     echo "Dock: $joined"
 }
 
